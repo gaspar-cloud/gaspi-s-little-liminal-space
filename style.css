@@ -1,0 +1,257 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: "Comic Sans MS", "Comic Sans", cursive; /* fuente de texto   */
+  background-color: black; /*color de fondo*/ 
+  color: rgb(34, 0, 255); /*color de texto entradas*/ 
+  background-image: url('https://i.pinimg.com/736x/ff/bd/8d/ffbd8ddc00889b377a8f1704aef24cc6.jpg'); /*link de imagen del fondo de la pagina*/ 
+  background-size: cover;
+  background-position: center;
+}
+
+.fila-principal {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+.columna {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 20%;
+}
+
+.columna img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid rgb(255, 255, 255); /*borde la foto*/ 
+  box-shadow: 0 0 10px rgb(255, 3, 3); /*sombra del borde de la foto*/ 
+}
+
+.contenido {
+  flex: 1;
+  min-width: 300px;
+  text-align: center;
+  padding: 0 20px;
+  border-left: 2px dotted rgba(255, 105, 180, 0); /*lineas que separan las columnas, en este caso las deje transparentes*/ 
+  border-right: 2px dotted rgba(255, 105, 180, 0); /*lo mismo que arriba*/ 
+}
+
+h1 {
+  color: rgb(1, 2, 88) !important; /*color del titulo de la pagina*/ 
+  text-shadow: 0 0 10px rgb(123, 11, 106), 0 0 20px rgb(103, 10, 81); /*no estoy seguro que hace recomiendo experimentar*/ 
+  font-size: 2.5em;
+  animation: titileAnimation 2s infinite alternate;
+}
+
+@keyframes titileAnimation {
+  from { text-shadow: 0 0 10px rgb(255, 2, 2), 0 0 20px rgb(251, 96, 96); }
+  to { text-shadow: 0 0 15px rgb(255, 163, 163), 0 0 30px rgb(255, 213, 213), 0 0 40px rgb(255, 255, 255); } /*brillo del titulo*/ 
+}
+
+button {
+  background: #740b85; /*color de botones, excepto el de subir archivo*/ 
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: "Comic Sans MS", "Comic Sans", cursive; /*fuente de texto, recomiendo utilizar google fonts paracambiarlo*/ 
+  margin: 5px;
+  transition: all 0.3s;
+}
+
+button:hover {
+  background: #000000; /*color de botones al poner el mouse encima*/ 
+  color: rgb(255, 255, 255); /*color de texto del boton al poner mouse encima*/ 
+  transform: scale(1.05);
+}
+
+input {
+  padding: 10px;
+  border: 2px solid rgb(255, 255, 255); /*color de borde al escribir entrada de texto*/ 
+  border-radius: 10px;
+  background: rgb(16, 16, 13); /*color de fondo al escribir entrada de texto*/ 
+  color: rgb(255, 0, 195); /*no se */ 
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  width: 70%;
+  margin-bottom: 10px;
+}
+
+#blog {
+  margin-top: 20px;
+  text-align: left;
+  border-top: 2px dotted rgba(255, 214, 10, 0); /*borde de separacipon de entrada de textos y textos/archivos subidos*/ 
+  padding-top: 20px;
+}
+
+#blog p {
+  background: rgb(1, 5, 21); /*fondo del texto ya subido */ 
+  padding: 10px;
+  border-radius: 10px;
+  border-left: 3px solid rgb(255, 255, 255); /*borde izquierdo de texto subido*/ 
+  margin: 10px 0;
+}
+
+.contenido .marquee {
+  width: 100%;
+  overflow: hidden;
+  background: rgb(0, 0, 0) !important;  /*color de fondo de marquesina */ 
+  padding: 5px 0;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.contenido .marquee span {
+  display: inline-block; /* Mantener esto */
+  padding-left: 100%; /* Mantener esto */
+  animation: marquee 15s linear infinite; /* Mantener esto */
+  color: white; /* Mantener esto */ /*color de texto de marquesina*/ 
+  white-space: nowrap; /* ¡IMPORTANTE! Evita que el texto se divida en varias líneas */
+}
+
+@keyframes marquee {
+  0%   { transform: translate(0, 0); }
+  100% { transform: translate(-100%, 0); }
+}
+
+.cursor {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.footer {
+  margin-top: 30px;
+  font-size: 0.8em;
+  color: #444444;  /* color texto inferior */
+}
+
+/* Estilo para las entradas del blog */
+.entrada-blog {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(81, 28, 90, 0.24); /* fondo de entrada de blog */
+  padding: 10px;
+  border-radius: 10px;
+  border-left: 3px solid rgba(255, 255, 255, 0.479); /* Esquina de entrada del blog */
+  margin: 10px 0;
+}
+
+.borrar-entrada {
+  background: #282828; /* boton de borrar entrada  */
+  color: rgb(45, 45, 45); /* color de texto borrar entrada */
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.borrar-entrada:hover {
+  background: #000000; /* boton de borrar al poner mouse encima */
+}
+
+/* Estilos para la subida de archivos */
+button {
+  /* Tus estilos existentes... */
+  margin: 5px;
+}
+
+/* Contenedor de archivos */
+.entrada-archivo {
+  background: rgb(253, 236, 3); /* no se  */
+  padding: 15px;
+  border-radius: 10px;
+  margin: 10px 0;
+  border-left: 3px solid rgb(254, 254, 254); /* no se  */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Imágenes subidas */
+.imagen-subida {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.3); /*color de borde de imagen subida  */
+}
+
+/* Audio subido */
+.audio-subido {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 10px;
+}
+
+/* Enlaces de documentos */
+.enlace-documento {
+  color: #ff69b4;
+  text-decoration: none;
+  font-weight: bold;
+  margin-bottom: 10px;
+  padding: 8px 15px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+  border: 1px solid #ff69b4;
+}
+
+.enlace-documento:hover {
+  background: rgba(255, 105, 180, 0.2);
+  color: white;
+}
+/* Estilos para archivos subidos */
+.entrada-blog img {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.entrada-blog audio {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.entrada-blog a {
+  color: #ff69b4;
+  text-decoration: none;
+  font-weight: bold;
+  margin-bottom: 10px;
+  padding: 8px 15px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+  border: 1px solid #ff69b4;
+  display: inline-block;
+}
+
+.entrada-blog a:hover {
+  background: rgba(255, 105, 180, 0.2);
+  color: white;
+}
+
+/* Botón de subir archivo */
+button[onclick*="subir-archivo"] {
+  background: #110169 !important; /* color de boton de subir archivo  */
+  color: white !important; /* color de texto de subir archivo  */
+}
+
+button[onclick*="subir-archivo"]:hover {
+  background: #5f0000 !important; /* color de boton de subir archivo al poner el mouse encima  */
+}
