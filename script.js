@@ -5,7 +5,7 @@ let esAdmin = false;
 
 // Función para el botón de saludo
 function saludar() {
-  alert("felipe was here,");
+  alert("felipe was not here");
 }
 
 // Función para agregar texto al blog
@@ -308,3 +308,4 @@ function cargarArchivosGuardados() {
   const archivos = JSON.parse(localStorage.getItem('archivosBlog') || '[]');
   archivos.forEach(archivo => {
     if (
+
