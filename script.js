@@ -33,6 +33,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Función para agregar texto al blog
 function agregarTexto() {
+  if (!esAdmin) {
+    alert("Solo el administrador puede agregar entradas.");
+    return;
+  }
+  
   const input = document.getElementById("nuevo-texto");
   const texto = input.value.trim();
   
