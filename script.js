@@ -5,31 +5,8 @@ let esAdmin = false;
 
 // Función para el botón de saludo
 function saludar() {
-  alert("felipe was here");
+  alert("felipe was here,");
 }
-
-// Cargar contenido guardado al iniciar
-document.addEventListener('DOMContentLoaded', function() {
-  cargarContenido();
-  actualizarContador();
-  cargarArchivosGuardados();
-  
-  // Verificar si ya era admin
-  if (localStorage.getItem('esAdmin') === 'true') {
-    esAdmin = true;
-    document.getElementById('panel-admin').style.display = 'block';
-    document.getElementById('admin-login').style.display = 'none';
-  }
-
-  // Configurar evento para subida de archivos
-  const inputArchivo = document.getElementById('subir-archivo');
-  if (inputArchivo) {
-    inputArchivo.addEventListener('change', function(e) {
-      console.log('📁 Archivo seleccionado');
-      manejarSubidaArchivo(this);
-    });
-  }
-});
 
 // Función para agregar texto al blog
 function agregarTexto() {
@@ -330,18 +307,4 @@ function guardarMetadatosArchivo(url, tipo, nombreOriginal) {
 function cargarArchivosGuardados() {
   const archivos = JSON.parse(localStorage.getItem('archivosBlog') || '[]');
   archivos.forEach(archivo => {
-    if (archivo.tipo.startsWith('image/')) {
-      crearEntradaImagen(archivo.url, archivo.nombre);
-    } else if (archivo.tipo.startsWith('audio/')) {
-      crearEntradaAudio(archivo.url, archivo.nombre);
-    } else {
-      crearEntradaDocumento(archivo.url, archivo.nombre);
-    }
-  });
-}
-
-function eliminarArchivoDeStorage(url) {
-  const archivos = JSON.parse(localStorage.getItem('archivosBlog') || '[]');
-  const nuevosArchivos = archivos.filter(archivo => archivo.url !== url);
-  localStorage.setItem('archivosBlog', JSON.stringify(nuevosArchivos));
-}
+    if (
