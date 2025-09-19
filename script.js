@@ -229,4 +229,113 @@ function crearEntradaDocumento(src, nombre) {
   contenedor.appendChild(enlace);
   contenedor.appendChild(botonBorrar);
   div.appendChild(contenedor);
+} // ← ¡ESTA LLAVE FALTABA!
+
+// ==============================================
+// FUNCIONES PARA SUBIR ARCHIVOS A GITHUB (NUEVO)
+// ==============================================
+
+async function subirArchivoAGitHub(archivo) {
+  try {
+    // Convertir archivo a Base64
+    const reader = new FileReader();
+    const promesa = new Promise((resolve) => {
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+    });
+    reader.readAsDataURL(archivo);
+    const contenidoBase64 = await promesa;
+
+    // Subir a GitHub
+    const response = await fetch(
+      `https://api.github.com/repos/${GH_CONFIG.usuario}/${GH_CONFIG.repo}/contents/archivos/${Date.now()}-${archivo.name}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${GH_CONFIG.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `Subir ${archivo.name}`,
+          content: contenidoBase64,
+          branch: 'main',
+        }),
+      }
+    );
+
+    const data = await response.json();
+    return data.content.download_url;
+  } catch (error) {
+    console.error('Error subiendo archivo:', error);
+    return null;
+  }
 }
+async function manejarSubidaArchivo(input) {
+  if (!window.esAdmin) {
+    alert('Solo el administrador puede subir archivos');
+    return;
+  }
+
+  const archivo = input.files[0];
+  if (!archivo) return;
+
+  const url = await subirArchivoAGitHub(archivo);
+  if (url) {
+    // ... tu código actual para crear entradas
+  }
+
+  let esAdmin = false;
+
+function verificarAdmin() {
+  const password = document.getElementById('admin-password').value;
+  // Cambia 'mi-contraseña-secreta' por una contraseña real
+  if (password === 'mi-contraseña-secreta') {
+    esAdmin = true;
+    document.getElementById('panel-admin').style.display = 'block';
+    document.getElementById('admin-login').style.display = 'none';
+    localStorage.setItem('esAdmin', 'true');
+  } else {
+    alert('Contraseña incorrecta');
+  }
+}
+
+// Al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+  if (localStorage.getItem('esAdmin') === 'true') {
+    esAdmin = true;
+    document.getElementById('panel-admin').style.display = 'block';
+    document.getElementById('admin-login').style.display = 'none';
+  }
+});
+
+function guardarMetadatosArchivo(url, tipo, nombreOriginal) {
+  const archivos = JSON.parse(localStorage.getItem('archivosBlog') || '[]');
+  archivos.push({
+    url: url,
+    tipo: tipo,
+    nombre: nombreOriginal,
+    fecha: new Date().toISOString()
+  });
+  localStorage.setItem('archivosBlog', JSON.stringify(archivos));
+}
+
+function cargarArchivosGuardados() {
+  const archivos = JSON.parse(localStorage.getItem('archivosBlog') || '[]');
+  archivos.forEach(archivo => {
+    if (archivo.tipo.startsWith('image/')) {
+      crearEntradaImagen(archivo.url, archivo.nombre);
+    } else if (archivo.tipo.startsWith('audio/')) {
+      crearEntradaAudio(archivo.url, archivo.nombre);
+    } else {
+      crearEntradaDocumento(archivo.url, archivo.nombre);
+    }
+  });
+}
+
+// En tu DOMContentLoaded:
+document.addEventListener('DOMContentLoaded', function() {
+  cargarContenido();
+  actualizarContador();
+  cargarArchivosGuardados(); // ← Añade esta línea
+});
+}
+ // ← Esta es la última llave que cierra todo el documento
