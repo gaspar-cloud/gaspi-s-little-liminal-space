@@ -307,5 +307,43 @@ function guardarMetadatosArchivo(url, tipo, nombreOriginal) {
 function cargarArchivosGuardados() {
   const archivos = JSON.parse(localStorage.getItem('archivosBlog') || '[]');
   archivos.forEach(archivo => {
-    if (
+    if (archivo.tipo.startsWith('image/')) {
+      crearEntradaImagen(archivo.url, archivo.nombre);
+    } else if (archivo.tipo.startsWith('audio/')) {
+      crearEntradaAudio(archivo.url, archivo.nombre);
+    } else {
+      crearEntradaDocumento(archivo.url, archivo.nombre);
+    }
+  });
+}
 
+function eliminarArchivoDeStorage(url) {
+  const archivos = JSON.parse(localStorage.getItem('archivosBlog') || '[]');
+  const nuevosArchivos = archivos.filter(archivo => archivo.url !== url);
+  localStorage.setItem('archivosBlog', JSON.stringify(nuevosArchivos));
+}
+
+// ====== INICIALIZACIÓN DE LA PÁGINA ======
+function inicializar() {
+  cargarContenido();
+  actualizarContador();
+  cargarArchivosGuardados();
+  
+  // Verificar si ya era admin
+  if (localStorage.getItem('esAdmin') === 'true') {
+    esAdmin = true;
+    document.getElementById('panel-admin').style.display = 'block';
+    document.getElementById('admin-login').style.display = 'none';
+  }
+
+  // Configurar evento para subida de archivos
+  const inputArchivo = document.getElementById('subir-archivo');
+  if (inputArchivo) {
+    inputArchivo.addEventListener('change', function(e) {
+      console.log('📁 Archivo seleccionado');
+      manejarSubidaArchivo(this);
+    });
+  }
+}
+
+window.onload = inicializar;
