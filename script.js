@@ -1,26 +1,37 @@
-// ====== FUNCIONES EXISTENTES (MANTENER TODAS) ======
+// ====== VARIABLES GLOBALES ======
+let esAdmin = false;
+
+// ====== FUNCIONES EXISTENTES ======
 
 // Función para el botón de saludo
 function saludar() {
   alert("felipe was here");
 }
 
-// Cargar contenido guardado al iniciar Y configurar subida de archivos
+// Cargar contenido guardado al iniciar
 document.addEventListener('DOMContentLoaded', function() {
   cargarContenido();
   actualizarContador();
+  cargarArchivosGuardados();
   
+  // Verificar si ya era admin
+  if (localStorage.getItem('esAdmin') === 'true') {
+    esAdmin = true;
+    document.getElementById('panel-admin').style.display = 'block';
+    document.getElementById('admin-login').style.display = 'none';
+  }
+
   // Configurar evento para subida de archivos
   const inputArchivo = document.getElementById('subir-archivo');
   if (inputArchivo) {
     inputArchivo.addEventListener('change', function(e) {
-      console.log('📁 Archivo seleccionado (event listener)');
+      console.log('📁 Archivo seleccionado');
       manejarSubidaArchivo(this);
     });
   }
 });
 
-// Función para agregar texto al blog (MANTENER ESTA)
+// Función para agregar texto al blog
 function agregarTexto() {
   const input = document.getElementById("nuevo-texto");
   const texto = input.value.trim();
@@ -56,7 +67,7 @@ function agregarTexto() {
   input.focus();
 }
 
-// Función para guardar en localStorage (MANTENER ESTA)
+// Función para guardar en localStorage
 function guardarEnStorage() {
   const entradas = [];
   const elementos = document.querySelectorAll('#blog .entrada-blog p');
@@ -66,7 +77,7 @@ function guardarEnStorage() {
   localStorage.setItem("blogEntradas", JSON.stringify(entradas));
 }
 
-// Función para cargar contenido (MANTENER ESTA)
+// Función para cargar contenido
 function cargarContenido() {
   const div = document.getElementById("blog");
   if (localStorage.getItem("blogEntradas")) {
@@ -95,7 +106,7 @@ function cargarContenido() {
   }
 }
 
-// Contador de visitas (MANTENER ESTA)
+// Contador de visitas
 function actualizarContador() {
   let contador = localStorage.getItem("visitas") || 0;
   contador = parseInt(contador) + 1;
@@ -103,7 +114,7 @@ function actualizarContador() {
   document.getElementById("contador").textContent = contador;
 }
 
-// Función para borrar todo el contenido (MANTENER ESTA)
+// Función para borrar todo el contenido
 function borrarTodo() {
   const div = document.getElementById("blog");
   if (div.children.length === 0) {
@@ -114,126 +125,67 @@ function borrarTodo() {
   if (confirm("¿Estás seguro de que quieres borrar TODO el contenido?")) {
     div.innerHTML = "";
     localStorage.setItem("blogEntradas", JSON.stringify([]));
+    localStorage.setItem("archivosBlog", JSON.stringify([]));
     alert("Todo el contenido ha sido borrado");
   }
 }
 
-// ====== FUNCIONES NUEVAS PARA SUBIR ARCHIVOS (SOLO ESTAS 4) ======
+// ====== SISTEMA ADMIN ======
+function verificarAdmin() {
+  const password = document.getElementById('admin-password').value;
+  if (password === 'mi-contraseña-secreta') {
+    esAdmin = true;
+    document.getElementById('panel-admin').style.display = 'block';
+    document.getElementById('admin-login').style.display = 'none';
+    localStorage.setItem('esAdmin', 'true');
+    alert('Modo administrador activado');
+  } else {
+    alert('Contraseña incorrecta');
+  }
+}
 
-function manejarSubidaArchivo(input) {
+// ====== FUNCIONES PARA SUBIR ARCHIVOS ======
+async function manejarSubidaArchivo(input) {
   console.log("Archivo seleccionado!");
   const archivo = input.files[0];
   if (!archivo) {
     console.log("No se seleccionó archivo");
     return;
   }
-  
-  const reader = new FileReader();
-  
-  reader.onload = function(e) {
-    const contenido = e.target.result;
-    console.log("Archivo cargado correctamente");
+
+  // Verificar si es admin
+  if (!esAdmin) {
+    alert('Solo el administrador puede subir archivos');
+    return;
+  }
+
+  try {
+    // 1. Subir a GitHub y obtener URL pública
+    const urlGitHub = await subirArchivoAGitHub(archivo);
     
+    if (!urlGitHub) {
+      throw new Error('No se pudo subir el archivo a GitHub');
+    }
+
+    console.log("Archivo subido a GitHub:", urlGitHub);
+    
+    // 2. Crear entrada en el blog con la URL de GitHub
     if (archivo.type.startsWith('image/')) {
-      crearEntradaImagen(contenido, archivo.name);
+      crearEntradaImagen(urlGitHub, archivo.name);
     } else if (archivo.type.startsWith('audio/')) {
-      crearEntradaAudio(contenido, archivo.name);
+      crearEntradaAudio(urlGitHub, archivo.name);
     } else {
-      crearEntradaDocumento(contenido, archivo.name);
+      crearEntradaDocumento(urlGitHub, archivo.name);
     }
-  };
-  
-  reader.readAsDataURL(archivo);
+
+    // 3. Guardar referencia en localStorage
+    guardarMetadatosArchivo(urlGitHub, archivo.type, archivo.name);
+
+  } catch (error) {
+    console.error('Error en la subida:', error);
+    alert('Error al subir el archivo: ' + error.message);
+  }
 }
-
-function crearEntradaImagen(src, nombre) {
-  const div = document.getElementById('blog');
-  const contenedor = document.createElement('div');
-  contenedor.className = 'entrada-blog';
-  
-  const img = document.createElement('img');
-  img.src = src;
-  img.alt = nombre;
-  img.style.maxWidth = '100%';
-  img.style.maxHeight = '300px';
-  img.style.borderRadius = '8px';
-  img.style.marginBottom = '10px';
-  
-  const botonBorrar = document.createElement('button');
-  botonBorrar.textContent = 'X';
-  botonBorrar.className = 'borrar-entrada';
-  botonBorrar.onclick = function() {
-    if (confirm('¿Borrar esta imagen?')) {
-      contenedor.remove();
-    }
-  };
-  
-  contenedor.appendChild(img);
-  contenedor.appendChild(botonBorrar);
-  div.appendChild(contenedor);
-}
-
-function crearEntradaAudio(src, nombre) {
-  const div = document.getElementById('blog');
-  const contenedor = document.createElement('div');
-  contenedor.className = 'entrada-blog';
-  
-  const audio = document.createElement('audio');
-  audio.controls = true;
-  audio.src = src;
-  audio.style.width = '100%';
-  audio.style.marginBottom = '10px';
-  
-  const botonBorrar = document.createElement('button');
-  botonBorrar.textContent = 'X';
-  botonBorrar.className = 'borrar-entrada';
-  botonBorrar.onclick = function() {
-    if (confirm('¿Borrar este audio?')) {
-      contenedor.remove();
-    }
-  };
-  
-  contenedor.appendChild(audio);
-  contenedor.appendChild(botonBorrar);
-  div.appendChild(contenedor);
-}
-
-function crearEntradaDocumento(src, nombre) {
-  const div = document.getElementById('blog');
-  const contenedor = document.createElement('div');
-  contenedor.className = 'entrada-blog';
-  
-  const enlace = document.createElement('a');
-  enlace.href = src;
-  enlace.textContent = `📄 ${nombre}`;
-  enlace.download = nombre;
-  enlace.style.color = '#ff69b4';
-  enlace.style.textDecoration = 'none';
-  enlace.style.fontWeight = 'bold';
-  enlace.style.marginBottom = '10px';
-  enlace.style.padding = '8px 15px';
-  enlace.style.background = 'rgba(0, 0, 0, 0.3)';
-  enlace.style.borderRadius = '5px';
-  enlace.style.border = '1px solid #ff69b4';
-  enlace.style.display = 'inline-block';
-  
-  const botonBorrar = document.createElement('button');
-  botonBorrar.textContent = 'X';
-  botonBorrar.className = 'borrar-entrada';
-  botonBorrar.onclick = function() {
-    if (confirm('¿Borrar este documento?')) {
-      contenedor.remove();
-    }
-  };
-  
-  contenedor.appendChild(enlace);
-  contenedor.appendChild(botonBorrar);
-  div.appendChild(contenedor);
-} // ← ¡ESTA LLAVE FALTABA!
-
-// ==============================================
-// FUNCIONES PARA SUBIR ARCHIVOS A GITHUB (NUEVO)
-// ==============================================
 
 async function subirArchivoAGitHub(archivo) {
   try {
@@ -269,44 +221,96 @@ async function subirArchivoAGitHub(archivo) {
     return null;
   }
 }
-async function manejarSubidaArchivo(input) {
-  if (!window.esAdmin) {
-    alert('Solo el administrador puede subir archivos');
-    return;
-  }
 
-  const archivo = input.files[0];
-  if (!archivo) return;
-
-  const url = await subirArchivoAGitHub(archivo);
-  if (url) {
-    // ... tu código actual para crear entradas
-  }
-
-  let esAdmin = false;
-
-function verificarAdmin() {
-  const password = document.getElementById('admin-password').value;
-  // Cambia 'mi-contraseña-secreta' por una contraseña real
-  if (password === 'mi-contraseña-secreta') {
-    esAdmin = true;
-    document.getElementById('panel-admin').style.display = 'block';
-    document.getElementById('admin-login').style.display = 'none';
-    localStorage.setItem('esAdmin', 'true');
-  } else {
-    alert('Contraseña incorrecta');
-  }
+function crearEntradaImagen(src, nombre) {
+  const div = document.getElementById('blog');
+  const contenedor = document.createElement('div');
+  contenedor.className = 'entrada-blog';
+  
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = nombre;
+  img.style.maxWidth = '100%';
+  img.style.maxHeight = '300px';
+  img.style.borderRadius = '8px';
+  img.style.marginBottom = '10px';
+  
+  const botonBorrar = document.createElement('button');
+  botonBorrar.textContent = 'X';
+  botonBorrar.className = 'borrar-entrada';
+  botonBorrar.onclick = function() {
+    if (confirm('¿Borrar esta imagen?')) {
+      contenedor.remove();
+      eliminarArchivoDeStorage(src);
+    }
+  };
+  
+  contenedor.appendChild(img);
+  contenedor.appendChild(botonBorrar);
+  div.appendChild(contenedor);
 }
 
-// Al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
-  if (localStorage.getItem('esAdmin') === 'true') {
-    esAdmin = true;
-    document.getElementById('panel-admin').style.display = 'block';
-    document.getElementById('admin-login').style.display = 'none';
-  }
-});
+function crearEntradaAudio(src, nombre) {
+  const div = document.getElementById('blog');
+  const contenedor = document.createElement('div');
+  contenedor.className = 'entrada-blog';
+  
+  const audio = document.createElement('audio');
+  audio.controls = true;
+  audio.src = src;
+  audio.style.width = '100%';
+  audio.style.marginBottom = '10px';
+  
+  const botonBorrar = document.createElement('button');
+  botonBorrar.textContent = 'X';
+  botonBorrar.className = 'borrar-entrada';
+  botonBorrar.onclick = function() {
+    if (confirm('¿Borrar este audio?')) {
+      contenedor.remove();
+      eliminarArchivoDeStorage(src);
+    }
+  };
+  
+  contenedor.appendChild(audio);
+  contenedor.appendChild(botonBorrar);
+  div.appendChild(contenedor);
+}
 
+function crearEntradaDocumento(src, nombre) {
+  const div = document.getElementById('blog');
+  const contenedor = document.createElement('div');
+  contenedor.className = 'entrada-blog';
+  
+  const enlace = document.createElement('a');
+  enlace.href = src;
+  enlace.textContent = `📄 ${nombre}`;
+  enlace.download = nombre;
+  enlace.style.color = '#ff69b4';
+  enlace.style.textDecoration = 'none';
+  enlace.style.fontWeight = 'bold';
+  enlace.style.marginBottom = '10px';
+  enlace.style.padding = '8px 15px';
+  enlace.style.background = 'rgba(0, 0, 0, 0.3)';
+  enlace.style.borderRadius = '5px';
+  enlace.style.border = '1px solid #ff69b4';
+  enlace.style.display = 'inline-block';
+  
+  const botonBorrar = document.createElement('button');
+  botonBorrar.textContent = 'X';
+  botonBorrar.className = 'borrar-entrada';
+  botonBorrar.onclick = function() {
+    if (confirm('¿Borrar este documento?')) {
+      contenedor.remove();
+      eliminarArchivoDeStorage(src);
+    }
+  };
+  
+  contenedor.appendChild(enlace);
+  contenedor.appendChild(botonBorrar);
+  div.appendChild(contenedor);
+}
+
+// ====== ALMACENAMIENTO DE ARCHIVOS ======
 function guardarMetadatosArchivo(url, tipo, nombreOriginal) {
   const archivos = JSON.parse(localStorage.getItem('archivosBlog') || '[]');
   archivos.push({
@@ -331,11 +335,8 @@ function cargarArchivosGuardados() {
   });
 }
 
-// En tu DOMContentLoaded:
-document.addEventListener('DOMContentLoaded', function() {
-  cargarContenido();
-  actualizarContador();
-  cargarArchivosGuardados(); // ← Añade esta línea
-});
+function eliminarArchivoDeStorage(url) {
+  const archivos = JSON.parse(localStorage.getItem('archivosBlog') || '[]');
+  const nuevosArchivos = archivos.filter(archivo => archivo.url !== url);
+  localStorage.setItem('archivosBlog', JSON.stringify(nuevosArchivos));
 }
- // ← Esta es la última llave que cierra todo el documento
