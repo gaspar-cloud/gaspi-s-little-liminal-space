@@ -142,26 +142,26 @@ async function manejarSubidaArchivo(input) {
   }
 
   try {
-    // 1. Subir a GitHub y obtener URL pública
-    const urlGitHub = await subirArchivoAGitHub(archivo);
+    // 1. Subir a Cloudinary y obtener URL pública
+    const urlArchivo = await subirArchivoACloudinary(archivo);
     
-    if (!urlGitHub) {
-      throw new Error('No se pudo subir el archivo a GitHub');
+    if (!urlArchivo) {
+      throw new Error('No se pudo subir el archivo.');
     }
 
-    console.log("Archivo subido a GitHub:", urlGitHub);
+    console.log("Archivo subido a Cloudinary:", urlArchivo);
     
-    // 2. Crear entrada en el blog con la URL de GitHub
+    // 2. Crear entrada en el blog con la URL de Cloudinary
     if (archivo.type.startsWith('image/')) {
-      crearEntradaImagen(urlGitHub, archivo.name);
+      crearEntradaImagen(urlArchivo, archivo.name);
     } else if (archivo.type.startsWith('audio/')) {
-      crearEntradaAudio(urlGitHub, archivo.name);
+      crearEntradaAudio(urlArchivo, archivo.name);
     } else {
-      crearEntradaDocumento(urlGitHub, archivo.name);
+      crearEntradaDocumento(urlArchivo, archivo.name);
     }
 
     // 3. Guardar referencia en localStorage
-    guardarMetadatosArchivo(urlGitHub, archivo.type, archivo.name);
+    guardarMetadatosArchivo(urlArchivo, archivo.type, archivo.name);
 
   } catch (error) {
     console.error('Error en la subida:', error);
@@ -169,37 +169,23 @@ async function manejarSubidaArchivo(input) {
   }
 }
 
-async function subirArchivoAGitHub(archivo) {
-  try {
-    // Convertir archivo a Base64
-    const reader = new FileReader();
-    const promesa = new Promise((resolve) => {
-      reader.onload = () => resolve(reader.result.split(',')[1]);
-    });
-    reader.readAsDataURL(archivo);
-    const contenidoBase64 = await promesa;
+async function subirArchivoACloudinary(archivo) {
+  const formData = new FormData();
+  formData.append('file', archivo);
+  formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
 
-    // Subir a GitHub
+  try {
     const response = await fetch(
-      `https://api.github.com/repos/${GH_CONFIG.usuario}/${GH_CONFIG.repo}/contents/archivos/${Date.now()}-${archivo.name}`,
+      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/auto/upload`,
       {
-        method: 'PUT',
-        headers: {
-          'Authorization': `token ${GH_CONFIG.token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: `Subir ${archivo.name}`,
-          content: contenidoBase64,
-          branch: 'main',
-        }),
+        method: 'POST',
+        body: formData,
       }
     );
-
     const data = await response.json();
-    return data.content.download_url;
+    return data.secure_url; // Esta es la URL pública del archivo
   } catch (error) {
-    console.error('Error subiendo archivo:', error);
+    console.error('Error al subir a Cloudinary:', error);
     return null;
   }
 }
@@ -245,7 +231,7 @@ function crearEntradaAudio(src, nombre) {
   
   const botonBorrar = document.createElement('button');
   botonBorrar.textContent = 'X';
-  botonBorrar.className = 'borrar-entrada';
+  botonBorrar.className = "borrar-entrada";
   botonBorrar.onclick = function() {
     if (confirm('¿Borrar este audio?')) {
       contenedor.remove();
@@ -279,7 +265,7 @@ function crearEntradaDocumento(src, nombre) {
   
   const botonBorrar = document.createElement('button');
   botonBorrar.textContent = 'X';
-  botonBorrar.className = 'borrar-entrada';
+  botonBorrar.className = "borrar-entrada";
   botonBorrar.onclick = function() {
     if (confirm('¿Borrar este documento?')) {
       contenedor.remove();
