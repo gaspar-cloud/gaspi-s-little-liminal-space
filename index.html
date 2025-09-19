@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gaspi's little liminal space</title>
+  <title>Gaspi's little liminal space</title> <!-- titulo en la pestaña-->
   <!-- Enlaza el archivo CSS externo -->
   <link rel="stylesheet" href="style.css">
   <!-- Enlaza el archivo JavaScript con defer -->
@@ -14,26 +14,38 @@
     
     <!-- Columna izquierda -->
     <div class="columna izquierda">
-      <img src="https://i.pinimg.com/736x/bb/44/ca/bb44cae4b3e990ae0c0ca2b47743a163.jpg" alt="Foto izquierda 1">
+      <img src="https://i.pinimg.com/736x/bb/44/ca/bb44cae4b3e990ae0c0ca2b47743a163.jpg" alt="Foto izquierda 1"> <!-- links para agregar fotos en columna izquierda-->
       <img src="https://i.pinimg.com/1200x/d3/f7/41/d3f741e990333aabdd7bee363a0c94d4.jpg" alt="Foto izquierda 2">
     </div>
 
     <!-- Contenido central -->
     <div class="contenido">
       <div class="marquee">
-        <span>り乇丂ᄃﾑ刀丂の ﾑ ﾚの丂 ﾉ刀ｷﾉ乇尺刀の丂, 乇√のᄃﾑᄃﾉó刀 り乇 ﾚの丂 ﾶひ乇尺ｲの丂</span>
+        <span>り乇丂ᄃﾑ刀丂の ﾑ ﾚの丂 ﾉ刀ｷﾉ乇尺刀の丂, 乇√のᄃﾑᄃﾉó刀 り乇 ﾚの丂 ﾶひ乇尺ｲの丂</span> <!-- texto en marquesina-->
       </div>
       
-      <h1>liminal space</h1>
-      <p>feeling tipsy</p>
+      <h1>liminal space</h1> <!-- titulo en la pagina-->
+      <p>feeling tipsy</p> <!-- subtitulo-->
       
-      <button onclick="saludar()">:0</button>
+      <button onclick="saludar()">:0</button> <!-- boton random-->
+
+      <!-- En tu section.contenido -->
+<div id="admin-login" style="margin: 20px 0;">
+  <input type="password" id="admin-password" placeholder="Contraseña admin">
+  <button onclick="verificarAdmin()">Acceder como Admin</button>
+</div>
+
+<div id="panel-admin" style="display: none;">
+  <input type="file" id="subir-archivo" style="display: none;">
+  <button onclick="document.getElementById('subir-archivo').click()">📁 Subir Archivo</button>
+  <button onclick="borrarTodo()">🗑️ Borrar Todo</button>
+</div>
       
       <br><br>
       
-      <input id="nuevo-texto" placeholder="heeeeey">
-      <button onclick="agregarTexto()">CREATE</button>
-      <button onclick="borrarTodo()">DESTROY</button>
+      <input id="nuevo-texto" placeholder="heeeeey"> <!-- texto de ejemplo antes de escribir entradas-->
+      <button onclick="agregarTexto()">CREATE</button> <!-- boton para agregar entradas de texto, "create" se puede cambiar"-->
+      <button onclick="borrarTodo()">DESTROY</button> <!-- boton para borrar todas las entradas de texto, "destroy" se puede cambiar"-->
       
       <div id="blog"></div>
       
@@ -42,14 +54,14 @@
       <button onclick="document.getElementById('subir-archivo').click()">Subir Archivo</button>
       
       <div class="footer">
-        <p>hey there ;)</p>
-        <p>rots: <span id="contador">0</span></p>
+        <p>hey there ;)</p>  <!-- subtexto al final de la pagina-->
+        <p>rots: <span id="contador">0</span></p>  <!-- cantidad de visitas en la pagina-->
       </div>
     </div>
 
     <!-- Columna derecha -->
     <div class="columna derecha">
-      <img src="https://i.pinimg.com/736x/76/55/81/765581f31fbfe6cfed99894ed49165f0.jpg" alt="Foto derecha 1">
+      <img src="https://i.pinimg.com/736x/76/55/81/765581f31fbfe6cfed99894ed49165f0.jpg" alt="Foto derecha 1">  <!-- links de fotos en columna derecha-->
       <img src="https://i.pinimg.com/736x/32/11/0d/32110d3464fdd0a0b1c415db1bde498e.jpg" alt="Foto derecha 2">
       <img src="https://i.pinimg.com/736x/76/4d/e3/764de3aca9f39e28d0ea7f5bb7decd13.jpg" alt="Foto derecha 3">
     </div>
